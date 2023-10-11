@@ -134,7 +134,7 @@ public class Menu {
         int price = dishesHashMap.get(name);
         OrderItem existingOrder = checkOrderExists(name);
         if (existingOrder != null) {
-            existingOrder.incrementQuantity();
+            existingOrder.incrementQuantityBy(getQuantity());
             return;
         }
         int quantity = getQuantity();

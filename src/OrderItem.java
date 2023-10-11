@@ -18,8 +18,8 @@ public class OrderItem {
         );
     }
 
-    public void incrementQuantity() {
-        this.quantity++;
+    public void incrementQuantityBy(int amount) {
+        this.quantity += amount;
         this.netCost = this.price * this.quantity;
     }
 }
