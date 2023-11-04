@@ -1,34 +1,35 @@
+
 import java.util.Scanner;
-import java.util.Set;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
 
 public class Menu {
-
     private final static Scanner scanner = new Scanner(System.in);
-    private final static String[] categories = {"Ulam", "Gulay", "Meryenda"};
-    private final static LinkedHashMap<String, Integer> MainDishes = new LinkedHashMap<>();
-    private final static LinkedHashMap<String, Integer> SideDishes = new LinkedHashMap<>();
-    private final static LinkedHashMap<String, Integer> Desserts = new LinkedHashMap<>();
+    private final static String[] categories = {"Karne Meals", "Gulay Meals", "Desserts", "Rice"};
+    private final static ArrayList<MenuItem> KarneMeals = new ArrayList<>();
+    private final static ArrayList<MenuItem> GulayMeals = new ArrayList<>();
+    private final static ArrayList<MenuItem> Desserts = new ArrayList<>();
     private static ArrayList<OrderItem> OrderItems = new ArrayList<>();
+    private static MenuItem Rice = new MenuItem("Rice", 12);
     private static String bunchOfNewLines = "";
 
     static {
-        MainDishes.put("Adobo", 60);
-        MainDishes.put("Sinigang na Bangus", 60);
-        MainDishes.put("Bopiz", 60);
-        MainDishes.put("Bicol Express", 60);
-        MainDishes.put("Beef Steak", 60);
+        KarneMeals.add(new MenuItem("Adobo", 40));
+        KarneMeals.add(new MenuItem("Sinigang", 40));
+        KarneMeals.add(new MenuItem("Sarciado", 40));
+        KarneMeals.add(new MenuItem("Beef Steak", 40));
+        KarneMeals.add(new MenuItem("Nilaga", 40));
 
-        SideDishes.put("Chopsuey", 23);
-        SideDishes.put("Ampalaya", 23);
-        SideDishes.put("Basta gulay", 23);
-        SideDishes.put("Mapait na gulay", 23);
+        GulayMeals.add(new MenuItem("Pinakbet", 30));
+        GulayMeals.add(new MenuItem("Toge", 30));
+        GulayMeals.add(new MenuItem("Munggo", 30));
+        GulayMeals.add(new MenuItem("Chopsuey", 30));
+        GulayMeals.add(new MenuItem("Ampalaya", 30));
 
-        Desserts.put("Halo halo", 67);
-        Desserts.put("Leche flan", 90);
-        Desserts.put("Ice cream", 40);
-
+        Desserts.add(new MenuItem("Halo-halo", 60));
+        Desserts.add(new MenuItem("Ice cream", 25));
+        Desserts.add(new MenuItem("Waffles", 30));
+        Desserts.add(new MenuItem("Leche flan", 90));
+        Desserts.add(new MenuItem("Chocolate cake", 120));
         for (int i = 0; i <= 100; i++) {
             bunchOfNewLines += "\n";
         }
@@ -37,27 +38,28 @@ public class Menu {
 
     public static void main(String[] args) {
         getCategoryChoice();
-
     }
-
 
     public static void getCategoryChoice() {
         printMainMenu();
-        String choice = getChoice();
+        String choice = getChoice().toLowerCase();
         switch (choice) {
+            case "exit":
+                System.out.println("Thank you!");
+                System.exit(0);
             case "0":
                 confirmOrder();
             case "1":
-                String[] mainDishesArr = {"Adobo", "Sinigang na Bangus", "Bopiz", "Bicol Express", "Beef Steak"};
-                getOrder(MainDishes, mainDishesArr);
+                getOrder(KarneMeals);
                 break;
             case "2":
-                String[] sideDishesArr = {"Chopsuey", "Ampalaya", "Basta gulay", "Mapait na gulay"};
-                getOrder(SideDishes, sideDishesArr);
+                getOrder(GulayMeals);
                 break;
             case "3":
-                String[] dessertsArr = {"Halo halo", "Leche flan", "Ice cream"};
-                getOrder(Desserts, dessertsArr);
+                getOrder(Desserts);
+                break;
+            case "4":
+                getRiceOrder();
                 break;
             default:
                 System.out.println(bunchOfNewLines + "Please enter the number of your choice.");
@@ -65,78 +67,75 @@ public class Menu {
         }
     }
 
-//    public static void getMainDishOrder() {
-////        System.out.println("This is Ulam menu. Enter 0");
-//        printMenuDishes(MainDishes);
-//        int choice = Integer.parseInt(getChoice());
-//        String[] mainDishes = {"Adobo", "Sinigang na Bangus", "Bopiz", "Bicol Express", "Beef Steak"};
-//        if (choice == 0) {
-//            getCategoryChoice();
-//        } else if (isValidChoice(choice, mainDishes)) {
-//            addOrderItem(mainDishes, choice);
-//            getCategoryChoice();
-//        } else {
-//            System.out.println("\n\n\n\n\nPlease enter the number of your choice.");
-//            getMainDishOrder();
-//        }
-//    }
-
-    public static void getOrder(LinkedHashMap<String, Integer> dishHashMap, String[] dishArray) {
-        printMenuOf(dishHashMap);
+    public static void getOrder(ArrayList<MenuItem> menu) {
+        printMenuOf(menu);
         int choice = Integer.parseInt(getChoice());
-//        String[] dishes = {"Adobo", "Sinigang na Bangus", "Bopiz", "Bicol Express", "Beef Steak"};
+
         if (choice == 0) {
             getCategoryChoice();
-        } else if (isValidChoice(choice, dishArray)) {
-            addOrderItem(dishHashMap, dishArray, choice);
+        } else if (isValidChoice(choice, menu)) {
+            addOrderItem(menu, choice);
+            System.out.println(bunchOfNewLines);
             getCategoryChoice();
         } else {
+//            System.out.println(bunchOfNewLines + "Please enter the number of your choice.");
             System.out.println(bunchOfNewLines + "Please enter the number of your choice.");
-            getOrder(dishHashMap, dishArray);
+            getOrder(menu);
         }
     }
 
-    public static boolean isValidChoice(int choice, String[] dishes) {
-        return choice > 0 && choice <= dishes.length;
+    public static void getRiceOrder() {
+        System.out.print("Enter how many order of rice: ");
+        int quantity = -1;
+        while (quantity < 0) {
+            quantity = scanner.nextInt();
+            scanner.nextLine(); // To consume the newline left by nextInt
+        }
+
+        if (quantity == 0) {
+            getCategoryChoice();;
+        } else {
+            OrderItem existingOrder = checkOrderExists("Rice");
+            if (existingOrder != null) {
+                existingOrder.incrementQuantityBy(quantity);
+            } else {
+                OrderItem order = new OrderItem(Rice.getName(), Rice.getPrice(), quantity);
+                OrderItems.add(order);
+                getCategoryChoice();
+            }
+        }
     }
 
-
-//    public static void getMeryendaOrder() {
-//        System.out.println("This is Meryenda menu. Enter 0");
-//        String choice = getChoice();
-//        switch (choice) {
-//            case "0":
-//                getCategoryChoice();
-//                break;
-//            default:
-//                getMeryendaOrder();
-//        }
-//    }
+    public static boolean isValidChoice(int choice, ArrayList<MenuItem> menu) {
+        return choice > 0 && choice <= menu.size();
+    }
 
     public static String getChoice() {
-        System.out.print("Enter the number of your choice: ");
+        System.out.print("Enter the number of your choice (or 'exit'): ");
         return scanner.nextLine();
     }
 
     public static int getQuantity() {
-//        System.out.print("Enter quantity (cannot be <= 0): ");
-//        int quantity = scanner.nextInt();
         int quantity = 0;
         while (quantity <= 0) {
             System.out.print("Enter quantity (cannot be <= 0): ");
             quantity = scanner.nextInt();
+            scanner.nextLine();  // To consume the newline left by nextInt
         }
         return quantity;
     }
 
-    public static void addOrderItem(LinkedHashMap<String, Integer> dishesHashMap, String[] arr, int choice) {
-        String name = arr[choice - 1];
-        int price = dishesHashMap.get(name);
+    public static void addOrderItem(ArrayList<MenuItem> menu, int choice) {
+        MenuItem item = menu.get(choice - 1);
+        String name = item.getName();
+        int price = item.getPrice();
+
         OrderItem existingOrder = checkOrderExists(name);
         if (existingOrder != null) {
             existingOrder.incrementQuantityBy(getQuantity());
             return;
         }
+
         int quantity = getQuantity();
         OrderItem orderItem = new OrderItem(name, price, quantity);
         OrderItems.add(orderItem);
@@ -144,7 +143,7 @@ public class Menu {
 
     public static OrderItem checkOrderExists(String name) {
         for (OrderItem orderItem : OrderItems) {
-            if (orderItem.name == name) {
+            if (orderItem.name.equals(name)) {
                 return orderItem;
             }
         }
@@ -152,25 +151,34 @@ public class Menu {
     }
 
     public static void printMainMenu() {
+        System.out.println("Enter 'exit' to exit.");
         System.out.println("[0] Confirm order");
         for (int i = 0; i < categories.length; i++) {
             System.out.printf("[%d] %s\n", i+1, categories[i]);
         }
     }
 
-    public static void printMenuOf(LinkedHashMap<String, Integer> menu) {
+    public static void printMenuOf(ArrayList<MenuItem> menu) {
         System.out.println("[0] Go back to main menu.");
-        Set<String> menuKeys = menu.keySet();
         int counter = 1;
-        for (String key : menuKeys) {
-            System.out.printf("[%d] %s\n", counter, key);
+        for (MenuItem item : menu) {
+            System.out.printf("[%d] %s\n", counter, item.getName());
             counter++;
         }
     }
 
-//    public static void printSideDish() {
-//        System.out.println("[0] Go back to main menu.");
-//    }
+    public static void processPayment(int totalCost) {
+        System.out.print("Please enter your money: ");
+        int payment = Integer.parseInt(scanner.nextLine());
+        if (payment < totalCost) {
+            System.out.println("Sorry, your money is not enough");
+            processPayment(totalCost);
+        }
+        else {
+            int change = payment - totalCost;
+            System.out.printf("Thank you. Here's your change: %d\n", change);
+        }
+    }
 
     public static void confirmOrder() {
         if (OrderItems.isEmpty()) {
@@ -186,6 +194,10 @@ public class Menu {
             totalCost += orderItem.netCost;
         }
         System.out.printf("Total cost is:  %d\n", totalCost);
+
+        processPayment(totalCost);
+
         System.exit(0);
     }
 }
+

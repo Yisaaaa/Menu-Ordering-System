@@ -1,5 +1,4 @@
 public class OrderItem {
-
     String name;
     int price, quantity, netCost;
 
